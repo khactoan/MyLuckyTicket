@@ -1,4 +1,6 @@
-﻿@{
+﻿@model IEnumerable<MyLuckyTicket.Models.User>
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -6,3 +8,28 @@
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Account</th>
+            <th scope="col">Tickets</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var item in Model.Select((user, index) => new { index, user }))
+        {
+            <tr>
+                <th scope="row">
+                    @( item.index + 1 )
+                </th>
+                <td>
+                    @Html.DisplayFor(modelItem => item.user.Account)
+                </td>
+                <td>
+                    @(String.Join(" ", item.user.Tickets.Select(ticket => ticket.Number)))
+                </td>
+            </tr>
+        }
+        </tbody>
+</table>

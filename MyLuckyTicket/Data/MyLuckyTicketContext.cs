@@ -11,5 +11,6 @@ namespace MyLuckyTicket.Data
         }
 
         public DbSet<User> User { get; set; }
+        public DbSet<Ticket> Ticket { get; set; }
     }
 }

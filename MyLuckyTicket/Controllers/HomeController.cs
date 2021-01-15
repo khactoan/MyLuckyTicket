@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MyLuckyTicket.Data;
 using MyLuckyTicket.Models;
 using System;
 using System.Collections.Generic;
@@ -12,15 +14,18 @@ namespace MyLuckyTicket.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly MyLuckyTicketContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, MyLuckyTicketContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var users = await _context.User.Include(user => user.Tickets).ToListAsync();
+            return View(users);
         }
 
         public IActionResult Privacy()
