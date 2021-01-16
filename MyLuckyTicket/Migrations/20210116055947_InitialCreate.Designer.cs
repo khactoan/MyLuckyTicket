@@ -9,8 +9,8 @@ using MyLuckyTicket.Data;
 namespace MyLuckyTicket.Migrations
 {
     [DbContext(typeof(MyLuckyTicketContext))]
-    [Migration("20210114154113_Ticket")]
-    partial class Ticket
+    [Migration("20210116055947_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -35,6 +35,8 @@ namespace MyLuckyTicket.Migrations
 
                     b.HasKey("ID");
 
+                    b.HasIndex("UserID");
+
                     b.ToTable("Ticket");
                 });
 
@@ -51,6 +53,22 @@ namespace MyLuckyTicket.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("User");
+                });
+
+            modelBuilder.Entity("MyLuckyTicket.Models.Ticket", b =>
+                {
+                    b.HasOne("MyLuckyTicket.Models.User", "User")
+                        .WithMany("Tickets")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MyLuckyTicket.Models.User", b =>
+                {
+                    b.Navigation("Tickets");
                 });
 #pragma warning restore 612, 618
         }
