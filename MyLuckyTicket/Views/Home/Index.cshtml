@@ -32,7 +32,7 @@
                     @( item.index + 1 )
                 </th>
                 <td class="account">
-                    @Html.DisplayFor(modelItem => item.user.Account)
+                    @Html.DisplayFor(modelItem => item.user.Account) (@item.user.Tickets.Count tickets)
                 </td>
                 <td>
                     @foreach(var ticket in item.user.Tickets.OrderBy(ticket => ticket.Number))
