@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyLuckyTicket.Data;
 using MyLuckyTicket.Models;
+using MyLuckyTicket.ViewModels;
 
 namespace MyLuckyTicket.Controllers
 {
@@ -60,20 +61,23 @@ namespace MyLuckyTicket.Controllers
             {
                 _context.Add(user);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Home");
             }
             return View(user);
         }
 
         // GET: Users/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public IActionResult Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var user = await _context.User.FindAsync(id);
+            var user = _context.User.Include(user => user.Tickets).Single(user => user.ID == id);
+            //var userData = new UserData();
+            //userData.User = user;
+            //userData.Tickets = user.Tickets;
             if (user == null)
             {
                 return NotFound();
@@ -86,7 +90,7 @@ namespace MyLuckyTicket.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Account")] User user)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Account")] User user, string[] ticketNumbers)
         {
             if (id != user.ID)
             {
@@ -98,6 +102,11 @@ namespace MyLuckyTicket.Controllers
                 try
                 {
                     _context.Update(user);
+                    _context.Ticket.RemoveRange(_context.Ticket.Where(ticket => ticket.UserID == user.ID));
+                    foreach(string ticketNumber in ticketNumbers.Where(ticketNumber => !string.IsNullOrEmpty(ticketNumber)).ToArray())
+                    {
+                        _context.Add(new Ticket { UserID = user.ID, Number = int.Parse(ticketNumber) });
+                    }
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -111,7 +120,7 @@ namespace MyLuckyTicket.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Home");
             }
             return View(user);
         }
@@ -142,7 +151,7 @@ namespace MyLuckyTicket.Controllers
             var user = await _context.User.FindAsync(id);
             _context.User.Remove(user);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "Home");
         }
 
         private bool UserExists(int id)

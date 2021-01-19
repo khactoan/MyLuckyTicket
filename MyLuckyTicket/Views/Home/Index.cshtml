@@ -5,9 +5,16 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 id="congrat" class="display-4">Congrats:</h1>
 </div>
+
+<div class="mb-3" style="display: flex">
+    <input type="text" class="form-control col-5" id="search-ticket-field" placeholder="Input ticket number">
+    <button id="seach-ticket" type="button" class="btn btn-secondary">Search</button>
+</div>
+<a asp-controller="Users" asp-action="Create" class="btn btn-success">Create new account</a><br>
+<br>
+
 <table class="table">
     <thead>
         <tr>
@@ -18,23 +25,27 @@
         </tr>
     </thead>
     <tbody>
-        @foreach(var item in Model.Select((user, index) => new { index, user }))
+        @foreach (var item in Model.Select((user, index) => new { index, user }))
         {
             <tr>
                 <th scope="row">
                     @( item.index + 1 )
                 </th>
-                <td>
+                <td class="account">
                     @Html.DisplayFor(modelItem => item.user.Account)
                 </td>
                 <td>
-                    @(String.Join(" ", item.user.Tickets.Select(ticket => ticket.Number)))
+                    @foreach(var ticket in item.user.Tickets.OrderBy(ticket => ticket.Number))
+                    {
+                        <span id="ticket-@ticket.Number" class="ticket-number">@Html.DisplayFor(model => ticket.Number)</span>
+                    }
                 </td>
                 <td>
                     <a asp-controller="Users" asp-action="Edit" asp-route-id="@item.user.ID" class="btn btn-primary">Edit</a>
-                    <button type="button" class="btn btn-danger">Delete</button>
+                    <a asp-controller="Users" asp-action="Delete" asp-route-id="@item.user.ID" class="btn btn-danger">Delete</a>
                 </td>
             </tr>
         }
-        </tbody>
+    </tbody>
 </table>
+<script src="~/js/home.js" asp-append-version="true"></script>
